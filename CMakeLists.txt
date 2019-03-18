@@ -69,10 +69,10 @@ set(TEST_CXX_FILE ${TEST_PROG_DIR}/test_cxx.cxx)
 # Settable options
 #============================================================================
 
-option(BUILD_STATIC "Build static library" ON)
-option(BUILD_SHARED "Build shared library" ON)
-option(BUILD_TESTING "Build library tests" ON)
-option(BUILD_DOCUMENTATION "Use Doxygen to create the HTML based API documentation" OFF)
+option(CRYPTOPP_BUILD_STATIC "Build static library" ON)
+option(CRYPTOPP_BUILD_SHARED "Build shared library" ON)
+option(CRYPTOPP_BUILD_TESTING "Build library tests" ON)
+option(CRYPTOPP_BUILD_DOCUMENTATION "Use Doxygen to create the HTML based API documentation" OFF)
 option(USE_INTERMEDIATE_OBJECTS_TARGET "Use a common intermediate objects target for the static and shared library targets" ON)
 
 # These are IA-32 options. TODO: Add ARM A-32, Aarch64 and Power8 options.
@@ -1021,7 +1021,7 @@ else ()
     )
 endif ()
 
-if (BUILD_STATIC)
+if (CRYPTOPP_BUILD_STATIC)
   add_library(cryptopp-static STATIC ${cryptopp_LIBRARY_SOURCES})
   cryptopp_target_compile_properties(cryptopp-static)
   if (NOT ${CMAKE_VERSION} VERSION_LESS "2.8.11")
@@ -1031,7 +1031,7 @@ if (BUILD_STATIC)
   endif ()
 endif ()
 
-if (BUILD_SHARED)
+if (CRYPTOPP_BUILD_SHARED)
   add_library(cryptopp-shared SHARED ${cryptopp_LIBRARY_SOURCES})
   cryptopp_target_compile_properties(cryptopp-shared)
   if (NOT ${CMAKE_VERSION} VERSION_LESS "2.8.11")
@@ -1045,12 +1045,12 @@ endif ()
 if (NOT MSVC)
   set(COMPAT_VERSION ${cryptopp_VERSION_MAJOR}.${cryptopp_VERSION_MINOR})
 
-  if (BUILD_STATIC)
+  if (CRYPTOPP_BUILD_STATIC)
     set_target_properties(cryptopp-static
         PROPERTIES
         OUTPUT_NAME cryptopp)
   endif ()
-  if (BUILD_SHARED)
+  if (CRYPTOPP_BUILD_SHARED)
     set_target_properties(cryptopp-shared
         PROPERTIES
         SOVERSION ${COMPAT_VERSION}
@@ -1061,10 +1061,10 @@ endif ()
 # Add alternate ways to invoke the build for the shared library that are
 # similar to how the crypto++ 'make' tool works.
 # see https://github.com/noloader/cryptopp-cmake/issues/32
-if (BUILD_STATIC)
+if (CRYPTOPP_BUILD_STATIC)
   add_custom_target(static DEPENDS cryptopp-static)
 endif ()
-if (BUILD_SHARED)
+if (CRYPTOPP_BUILD_SHARED)
   add_custom_target(shared DEPENDS cryptopp-shared)
   add_custom_target(dynamic DEPENDS cryptopp-shared)
 endif ()
@@ -1074,29 +1074,29 @@ endif ()
 #============================================================================
 
 if (WIN32)
-  if (BUILD_STATIC)
+  if (CRYPTOPP_BUILD_STATIC)
     target_link_libraries(cryptopp-static ws2_32)
   endif ()
-  if (BUILD_SHARED)
+  if (CRYPTOPP_BUILD_SHARED)
     target_link_libraries(cryptopp-shared ws2_32)
   endif ()
 endif ()
 
 # This may need to be expanded to "Solaris"
 if (CRYPTOPP_SOLARIS)
-  if (BUILD_STATIC)
+  if (CRYPTOPP_BUILD_STATIC)
     target_link_libraries(cryptopp-static nsl socket)
   endif ()
-  if (BUILD_SHARED)
+  if (CRYPTOPP_BUILD_SHARED)
     target_link_libraries(cryptopp-shared nsl socket)
   endif ()
 endif ()
 
 find_package(Threads)
-if (BUILD_STATIC)
+if (CRYPTOPP_BUILD_STATIC)
   target_link_libraries(cryptopp-static ${CMAKE_THREAD_LIBS_INIT})
 endif ()
-if (BUILD_SHARED)
+if (CRYPTOPP_BUILD_SHARED)
   target_link_libraries(cryptopp-shared ${CMAKE_THREAD_LIBS_INIT})
 endif ()
 
@@ -1105,7 +1105,7 @@ endif ()
 #============================================================================
 
 enable_testing()
-if (BUILD_TESTING)
+if (CRYPTOPP_BUILD_TESTING)
   add_executable(cryptest ${cryptopp_SOURCES_TEST})
   target_link_libraries(cryptest cryptopp-static)
 
@@ -1130,7 +1130,7 @@ endif ()
 # Doxygen documentation
 #============================================================================
 
-if (BUILD_DOCUMENTATION)
+if (CRYPTOPP_BUILD_DOCUMENTATION)
   find_package(Doxygen REQUIRED)
 
   set(in_source_DOCS_DIR "${SRC_DIR}/html-docs")
@@ -1158,7 +1158,7 @@ endif ()
 set(export_name "cryptopp-targets")
 
 # Runtime package
-if (BUILD_SHARED)
+if (CRYPTOPP_BUILD_SHARED)
   export(TARGETS cryptopp-shared FILE ${export_name}.cmake )
   install(
       TARGETS cryptopp-shared
@@ -1171,7 +1171,7 @@ if (BUILD_SHARED)
 endif ()
 
 # Development package
-if (BUILD_STATIC)
+if (CRYPTOPP_BUILD_STATIC)
   export(TARGETS cryptopp-static FILE ${export_name}.cmake )
   install(TARGETS cryptopp-static EXPORT ${export_name} DESTINATION ${CMAKE_INSTALL_LIBDIR})
 endif ()
@@ -1186,14 +1186,14 @@ if (NOT CMAKE_VERSION VERSION_LESS 2.8.8)
 endif ()
 
 # Tests
-if (BUILD_TESTING)
+if (CRYPTOPP_BUILD_TESTING)
   install(TARGETS cryptest DESTINATION ${CMAKE_INSTALL_BINDIR})
   install(DIRECTORY ${SRC_DIR}/TestData DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/cryptopp)
   install(DIRECTORY ${SRC_DIR}/TestVectors DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/cryptopp)
 endif ()
 
 # Documentation
-if (BUILD_DOCUMENTATION)
+if (CRYPTOPP_BUILD_DOCUMENTATION)
   install(DIRECTORY "${out_source_DOCS_DIR}" DESTINATION ${CMAKE_INSTALL_DOCDIR})
 endif ()
 
